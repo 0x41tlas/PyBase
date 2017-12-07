@@ -3,12 +3,9 @@
 # by Atlas @https://github.com/AtlasMerc
 # This is a Python database that impliments json. No extra
 # modules are required.
-#
-# Note: the .json file must be in the same directory
-# that you are running your interpreter from!
 
-import json # for reading JSON file
-import os # for cwd
+import json # for reading and parsing JSON
+import os # for file directory
 
 class search(object): # creates the search class
 
@@ -23,6 +20,8 @@ class search(object): # creates the search class
         self.interror = "[!] Int error"
         # Loads JSON file
         self.db = None
+        cwd = os.path.dirname(os.path.realpath(__file__))
+        self.dblocal = cwd + '/pydb.json'
         # Shows help on startup
         self.help()
 
@@ -50,13 +49,16 @@ class search(object): # creates the search class
                     1: self.search,
                     2: self.query,
                     3: self.view,
-                    4: self.help,
-                    5: self.delete
+                    4: self.delete,
+                    # 5: self.edit, not yet available
+                    9: self.help,
+                    0: exit
                 }[trigger]()
                 self.main()
 
             except Exception as e: # for sub-menus
-                print(e)
+                print(self.interror)
+                self.main()
 
 
     def search(self): # search function
@@ -82,7 +84,7 @@ class search(object): # creates the search class
         l = 0
         gen = (x for x in self.db if s in x[self.SEARCH[t]]) # quick way to combine for and if statements
         for i in gen:
-            print(json.dumps([i[x] for x in i], indent=4, sort_keys=True)) # displays fancy search results
+            print(json.dumps([i], indent=4, sort_keys=True)) # displays fancy search results
             l = l+1
         else:
             print("--------------------------------")
@@ -151,6 +153,10 @@ class search(object): # creates the search class
         del self.db[delID] # delets item with ebtered ID from the db
         self.modb() # updates the db
 
+    def edit(self):
+
+        return
+
     def help(self): # help function
 
         print
@@ -163,8 +169,10 @@ by Atlas @https://github.com/AtlasMerc
 1 = Search
 2 = Query
 3 = View
-4 = Help
-5 = Delete
+4 = Delete
+5 = Edit # not yet available
+9 = Help
+0 = Exit
 """
         )
         print
@@ -182,7 +190,7 @@ by Atlas @https://github.com/AtlasMerc
 
     def loadb(self): # adds and resets the database
 
-        with open('pydb.json', 'r+') as filedb: # opens db json file
+        with open(self.dblocal, 'r+') as filedb: # opens db json file
             self.db = json.load(filedb)
             idn = 0
             for a in self.db:                   # assigns ID's
@@ -192,8 +200,9 @@ by Atlas @https://github.com/AtlasMerc
 
     def modb(self): # update function
 
-        with open('pydb.json', 'w') as filedb: # opens db json file
+        with open(self.dblocal, 'w') as filedb: # opens db json file
             json.dump(self.db, filedb, indent=4, sort_keys=True) # updates the db
 
-Search = search() # creates the class
-Search.main() # runs the script
+if __name__ == '__main__':
+    Search = search() # creates the class
+    Search.main() # runs the script
